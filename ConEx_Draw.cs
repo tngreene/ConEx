@@ -125,6 +125,16 @@ namespace ConEx
             }
         }
 
+        public static void ChangeSize(int width, int height)
+        {
+            _dimensions.width = width;
+            _dimensions.height = height;
+            Console.WindowWidth = width;
+            Console.BufferWidth = width;
+
+            Console.WindowHeight = height;
+            Console.BufferHeight = height;
+        }
         /// <summary>
         /// Inserts a character into the drawing buffer and (potetially draws)
         /// </summary>
@@ -211,7 +221,7 @@ namespace ConEx
 
             if (h != IntPtr.Zero)
             {
-                CharInfo[] singleBuf = new CharInfo[Console.BufferHeight * Console.BufferWidth];
+                CharInfo[] singleBuf = new CharInfo[buffer.Length * buffer[0].Length];
 
                 int counter = 0;
                 for (int i = 0; i < buffer.Length; i++)
@@ -222,7 +232,7 @@ namespace ConEx
                         counter++;
                     }
                 }
-                SmallRect rect = new SmallRect() { Left = 0, Top = 0, Right = (short)ConEx_Draw.Dimensions.width, Bottom = (short)ConEx_Draw.Dimensions.height};
+                SmallRect rect = new SmallRect() { Left = 0, Top = 0, Right = (short)buffer[0].Length, Bottom = (short)buffer.Length};
 
                 bool b = WriteConsoleOutput(h, singleBuf,
                           new Coord() { X = (short)Dimensions.width, Y = (short)Dimensions.height },
