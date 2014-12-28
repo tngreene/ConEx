@@ -18,7 +18,7 @@ namespace ConEx
             //IntPtr hWnd = GetConsoleWindow();
             //ShowScrollBar(hWnd, 1, true);
             ConEx_Draw.Init(80, 25);
-            ConEx_Input.Init();
+            ConEx_Input.Init(200);
 
             Console.WriteLine("asdf");
             Console.WriteLine("asdf");
@@ -46,8 +46,29 @@ namespace ConEx
             ConEx_Draw.InsertCharacter((char)150, 14, 59,ConsoleColor.Cyan,ConsoleColor.DarkYellow);
             ConEx_Draw.InsertCharacter((char)200, 24, 79,ConsoleColor.Red);
             ConEx_Draw.DrawScreen();
-
             
+            ConEx.ConEx_Input.Init(20);
+            
+            while (true)
+            {
+                ConsoleKeyInfo[] arr = ConEx.ConEx_Input.GetInput();
+                for (int i = 0; i < arr.Length; i++)
+			    {
+                    Console.WriteLine("Char:{0},Shift{1},Alt{2},Ctrl{3}", arr[i].KeyChar,
+                                                                        arr[i].Modifiers.HasFlag(ConsoleModifiers.Shift),
+                                                                    arr[i].Modifiers.HasFlag(ConsoleModifiers.Alt),
+                                                                    arr[i].Modifiers.HasFlag(ConsoleModifiers.Control));
+			    }
+                System.Threading.Thread.Sleep(1000);
+                //Console.WriteLine(ConEx.ConEx_Input.IsKeyPressed(ConEx.ConEx_Input.VK_Code.VK_CONTROL));
+                
+                //ConsoleKeyInfo[] input = ConEx.ConEx_Input.GetInput();
+                //for (int i = 0; i < input.Length; i++)
+                {
+                  //  Console.WriteLine("Char:{0}",input[i].KeyChar);
+                }
+                //Console.Write(ConEx.ConEx_Input.Keys[ConEx_Input.VirtualKeyStates.VK_LCONTROL]);
+            }
             while (true)
             {
                 Point p = ConEx_Mouse.GetMousePosition();
