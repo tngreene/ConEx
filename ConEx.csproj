@@ -46,9 +46,13 @@
     <Compile Include="ConEx_Input.cs" />
     <Compile Include="ConEx_Mouse.cs" />
     <Compile Include="ConEx_Types.cs" />
+    <Compile Include="ConEx_Window.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(TargetPath) $(SolutionDir)..\BefungeSharp\BefungeSharp\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

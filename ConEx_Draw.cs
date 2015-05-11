@@ -105,24 +105,14 @@ namespace ConEx
         public static WindowDimensions Dimensions { get { return _dimensions; } set { _dimensions = value; } }
         
         private static CharInfo[][] buffer;
-        
-
+        private static CharInfo[] singleBuf;
+        private static SmallRect rect;
+        private static Coord dwBufferSize;
+        private static Coord dwBufferCoord;
 
         public static void Init(int width, int height)
         {
-            _dimensions.width = width;
-            _dimensions.height = height;
-            Console.WindowWidth = width;
-            Console.BufferWidth = width;
-
-            Console.WindowHeight = height;
-            Console.BufferHeight = height;
-            
-            buffer = new CharInfo[Console.BufferHeight][];
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = new CharInfo[Console.BufferWidth];
-            }
+            ChangeSize(width, height);
         }
 
         public static void ChangeSize(int width, int height)
@@ -134,6 +124,16 @@ namespace ConEx
 
             Console.WindowHeight = height;
             Console.BufferHeight = height;
+
+            buffer = new CharInfo[Console.BufferHeight][];
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                buffer[i] = new CharInfo[Console.BufferWidth];
+            }
+            singleBuf = new CharInfo[buffer.Length * buffer[0].Length];
+            rect = new SmallRect() { Left = 0, Top = 0, Right = (short)buffer[0].Length, Bottom = (short)buffer.Length };
+            dwBufferSize = new Coord() { X = (short)Dimensions.width, Y = (short)Dimensions.height };
+            dwBufferCoord = new Coord(0, 0);
         }
         /// <summary>
         /// Inserts a character into the drawing buffer and (potetially draws)
@@ -221,9 +221,10 @@ namespace ConEx
 
             if (h != IntPtr.Zero)
             {
-                CharInfo[] singleBuf = new CharInfo[buffer.Length * buffer[0].Length];
-
+               // System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+                
                 int counter = 0;
+                //watch.Restart();
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     for (int j = 0; j < buffer[i].Length; j++)
@@ -232,12 +233,14 @@ namespace ConEx
                         counter++;
                     }
                 }
-                SmallRect rect = new SmallRect() { Left = 0, Top = 0, Right = (short)buffer[0].Length, Bottom = (short)buffer.Length};
 
+                
+                //watch.Restart();
                 bool b = WriteConsoleOutput(h, singleBuf,
-                          new Coord() { X = (short)Dimensions.width, Y = (short)Dimensions.height },
-                          new Coord() { X = 0, Y = 0 },
+                            dwBufferSize,
+                            dwBufferCoord,
                           ref rect);
+                int stophere = 0;
             }
         }
         //-----------

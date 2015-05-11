@@ -13,7 +13,10 @@ namespace ConEx
     public static class ConEx_Input
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        private static extern short GetAsyncKeyState(int vkey);
+        static extern short GetKeyState(VK_Code nVirtKey);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        private static extern short GetAsyncKeyState(VK_Code vkey);
 
         //private static extern bool GetAysncKeyboardState(byte[] lpKeys);
         private static Dictionary<ConsoleKeyInfo,bool> _keys;
@@ -28,7 +31,7 @@ namespace ConEx
         public static void Init(int delay)
         {
             //_callback = InputLoop;
-            _inputTimer = new Timer(InputLoop, null, 0, delay);
+            //_inputTimer = new Timer(InputLoop, null, 0, delay);
         }
 
         private static bool _treatControlCAsInput = false;
@@ -59,12 +62,15 @@ namespace ConEx
             e.Cancel = true;
         }
 
-        [DllImport( "user32.dll" )]
-        static extern short GetKeyState(VK_Code nVirtKey );
+        /// <summary>
+        /// Ask the keyboard if a key is currently down
+        /// </summary>
+        /// <param name="testKey">The VK_Code to test</param>
+        /// <returns>True if it is down, false it it is not or possibly toggled</returns>
         public static bool IsKeyPressed(VK_Code testKey)
         {
             bool keyPressed = false;
-            short result = (short)GetAsyncKeyState( (int)testKey );
+            short result = (short)GetKeyState(testKey);
             
             switch( result )
             {
@@ -84,8 +90,6 @@ namespace ConEx
             return keyPressed;
         }
 
-
-        
         private static void InputLoop(Object state)
         {
           // Console.Write("Here");
