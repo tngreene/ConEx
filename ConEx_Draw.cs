@@ -205,6 +205,30 @@ namespace ConEx
             FillArea(c, 0, 0, _dimensions.width, _dimensions.height, foreground, background);
         }
 
+        public static ConsoleColor GetForegroundColor(int row, int column) 
+        {
+            if (Dimensions.Contains(row, column) == true)
+            {
+                return (ConsoleColor)(buffer[row][column].Attributes & (short)CellInfo.Color.ForegroundMask);
+            }
+            else
+            {
+                return ConsoleColor.White;
+            }
+        }
+
+        public static ConsoleColor GetBackgroundColor(int row, int column)
+        {
+            if (Dimensions.Contains(row, column) == true)
+            {
+                return (ConsoleColor)(buffer[row][column].Attributes & (short)CellInfo.Color.BackgroundMask);
+            }
+            else
+            {
+                return ConsoleColor.Black;
+            }
+        }
+
         public static void SetAttributes(int row, int column, ConsoleColor foreground, ConsoleColor background)
         {
             if (Dimensions.Contains(row, column) == true)

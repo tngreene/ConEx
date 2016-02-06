@@ -18,6 +18,7 @@ namespace ConEx
             //IntPtr hWnd = GetConsoleWindow();
             //ShowScrollBar(hWnd, 1, true);
             ConEx_Draw.Init(80, 25);
+            
             ConEx_Input.Init(200);
 
             Console.WriteLine("asdf");
@@ -28,25 +29,30 @@ namespace ConEx
             Console.WriteLine("asdf");
             Console.WriteLine("asdf");
             Console.Clear();
+            while (true)
+            {
+                //string input = Console.ReadLine();
+                ConEx_Draw.FillScreen('k');
+                ConEx_Draw.InsertCharacter((char)9500, 0, 0);
+                ConEx_Draw.InsertCharacter((char)9508, 0, 1);
+                ConEx_Draw.InsertCharacter((char)9516, 0, 2);
+                ConEx_Draw.InsertCharacter((char)9524, 0, 3);
+                ConEx_Draw.DrawScreen();
+                ConEx_Draw.InsertCharacter('a', 9, 9);
 
-            //string input = Console.ReadLine();
+                ConEx_Draw.InsertCharacter('A', 0, 15);
+                ConEx_Draw.InsertCharacter('n', 4, 1);
 
-            ConEx_Draw.InsertCharacter((char)9500,0,0);
-                ConEx_Draw.InsertCharacter((char)9508,0,1);
-                    ConEx_Draw.InsertCharacter((char)9516,0,2);
-                    ConEx_Draw.InsertCharacter((char)9524, 0, 3);
-                    ConEx_Draw.DrawScreen();
-            ConEx_Draw.InsertCharacter('a', 9, 9);
-            
-            ConEx_Draw.InsertCharacter('A', 0, 15);
-            ConEx_Draw.InsertCharacter('n', 4, 1);
-
-            ConEx_Draw.InsertCharacter('k', 3, 7,ConsoleColor.Gray,ConsoleColor.DarkGray);
-            ConEx_Draw.InsertCharacter('#', 10, 40,ConsoleColor.Green,ConsoleColor.Black);
-            ConEx_Draw.InsertCharacter((char)150, 14, 59,ConsoleColor.Cyan,ConsoleColor.DarkYellow);
-            ConEx_Draw.InsertCharacter((char)200, 24, 79,ConsoleColor.Red);
-            ConEx_Draw.DrawScreen();
-            
+                ConEx_Draw.InsertCharacter('k', 3, 7, ConsoleColor.Gray, ConsoleColor.DarkGray);
+                ConEx_Draw.InsertCharacter('#', 10, 40, ConsoleColor.Green, ConsoleColor.Black);
+                ConEx_Draw.InsertCharacter((char)150, 14, 59, ConsoleColor.Cyan, ConsoleColor.DarkYellow);
+                ConEx_Draw.InsertCharacter((char)200, 24, 79, ConsoleColor.Red);
+                System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+                ConEx_Draw.DrawScreen();
+                int thisis = 0;
+                thisis = 1;
+                ConEx_Draw.FillScreen(' ');
+            }
             ConEx.ConEx_Input.Init(20);
             
             while (true)

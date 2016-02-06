@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
-
+using System.Text.RegularExpressions;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -19,19 +19,16 @@ namespace ConEx
         private static extern short GetAsyncKeyState(VK_Code vkey);
 
         //private static extern bool GetAysncKeyboardState(byte[] lpKeys);
-        private static Dictionary<ConsoleKeyInfo,bool> _keys;
-        public static Dictionary<ConsoleKeyInfo, bool> Keys { get { return _keys; } }
+        //private static Dictionary<ConsoleKeyInfo,bool> _keys;
+        //public static Dictionary<ConsoleKeyInfo, bool> Keys { get { return _keys; } }
 
         public static bool ShiftDown { get { return IsKeyPressed(VK_Code.VK_SHIFT); } }
         public static bool AltDown { get { return IsKeyPressed(VK_Code.VK_MENU); } }
         public static bool CtrlDown { get { return IsKeyPressed(VK_Code.VK_CONTROL); } }
         
-        private static System.Threading.Timer _inputTimer;
-        
         public static void Init(int delay)
         {
-            //_callback = InputLoop;
-            //_inputTimer = new Timer(InputLoop, null, 0, delay);
+
         }
 
         private static bool _treatControlCAsInput = false;
@@ -90,15 +87,6 @@ namespace ConEx
             return keyPressed;
         }
 
-        private static void InputLoop(Object state)
-        {
-          // Console.Write("Here");
-            //UpdateKeys();
-        }
-
-        /// <summary>
-        /// Get which keys are currently pressed down and return them
-        /// </summary>
         /// <summary>
         /// Get which keys are currently pressed down and return them
         /// </summary>
@@ -129,21 +117,152 @@ namespace ConEx
             // Convert the list to an array and return
             return input.ToArray();
         }
+        
+        //TODO: Maybe we should not leave the user in an endless loop of trying to get matching input...
+        #region WaitForXMatch methods
+        
 
-        public static string ReadLine()
+        /// <summary>
+        /// Waits for a "yes" or "no"
+        /// </summary>
+        /// <param name="yes_word">The word representing yes, by default "yes"</param>
+        /// <param name="no_word">The word representing no, by default "no"</param>
+        /// <param name="error_msg">The displayed error if there is bad input</param>
+        /// <returns>True for yes, false for no</returns>
+        public static bool WaitForBooleanChoice(string yes_word = "yes",
+                                                string no_word = "no",
+                                                string error_msg = "Expected yes or no",
+                                                bool case_sensitive = false)
         {
-            string outline = "";
-            return outline;
-            /*do
+            while (true)
             {
-                bool enterPressed = false;
-                char input = Console.ReadKey(true);
+                string result = WaitForRegExMatch("(" + yes_word + "|" + no_word + ")", error_msg, case_sensitive);
 
-                //if(
+                if (result == yes_word)
+                {
+                    return true;
+                }
+                else if (result == no_word)
+                {
+                    return false;
+                }
             }
-            //while(*/
         }
 
+        /// <summary>
+        /// Waits for input from the user based on range of allowed values
+        /// Good for situations like getting a number between x and y
+        /// </summary>
+        /// <param name="lower_bound">The lowest character accepted (by value)</param>
+        /// <param name="upper_bound">The highest character accepted (by value)</param>
+        /// <param name="error_msg">The displayed error if there is bad input</param>
+        /// <returns>The chosen input or null if there was a bounds mismatch </returns>
+        public static char WaitForCharInRange(char lower_bound, char upper_bound, string error_msg = "Value out of bounds")
+        {
+            return (char)WaitForIntInRange((int)lower_bound,(int)upper_bound, true, error_msg);
+        }
+
+        /// <summary>
+        /// Waits for the user to input an integer between bounds
+        /// </summary>
+        /// <param name="lower_bound">The lowest allowed number (inclusive)</param>
+        /// <param name="upper_bound">The heighest allowed number (inclusive)</param>
+        /// <param name="single_key">
+        /// True if the caller wants ReadKey's behavior instead of Readline.
+        /// Note: The 
+        /// </param>
+        /// <param name="error_msg">The displayed error if there is bad input</param>
+        /// <returns>The inputed integer or null if there was a bounds mismatch</returns>
+        public static int WaitForIntInRange(int lower_bound, int upper_bound, bool single_key, string error_msg = "Value out of bounds")
+        {
+            //If our range is impossible
+            if (upper_bound < lower_bound)
+            {
+                //Return our error code
+                throw new Exception("Upperbound is less than lower bound");
+            }
+
+            if (single_key == true)
+            {
+                char input = '\0';
+                int output;
+                //Get their input
+                do
+                {
+                    if (Int32.TryParse(Console.ReadKey().KeyChar.ToString(), out output))
+                    {
+                        if (output < lower_bound || output > upper_bound)
+                        {
+                            Console.CursorLeft = 0;
+                            Console.WriteLine(error_msg);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Console.CursorLeft = 0;
+                        Console.WriteLine(error_msg);
+                    }
+                }
+                while (true); 
+                
+                return output;
+            }
+            else
+            {
+                while(true)
+                {
+                    try
+                    {
+                        return Convert.ToInt32(WaitForRegExMatch(@"^-?[0-9]+$", error_msg));
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Waits for a string matching a passed in regular expression
+        /// </summary>
+        /// <param name="regex_string">The string to match</param>
+        /// <param name="error_msg">The displayed error if there is bad input</param>
+        /// <param name="case_sensitive">If the regular expression is cases sensitive, default is false</param>
+        /// <returns>The inputed string or null if invalid</returns>
+        public static string WaitForRegExMatch(string regex_string, string error_msg, bool case_sensitive = false)
+        {
+            if (regex_string == null || error_msg == null)
+            {
+                return null;
+            }
+
+            while (regex_string != null)
+            {
+                string input = Console.ReadLine();
+                if (Regex.IsMatch(input,
+                                  regex_string,
+                                  case_sensitive ? RegexOptions.IgnoreCase : RegexOptions.None))
+                {
+                    return input;
+                }
+                else
+                {
+                    Console.WriteLine(error_msg);
+                    continue;
+                }
+            }
+            return null;
+        }
+        #endregion
+
+        /// <summary>
+        /// VK_Codes for P/Invoke calls
+        /// </summary>
         public enum VK_Code : int
         {
             VK_BACKSPACE = 8,

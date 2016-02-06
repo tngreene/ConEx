@@ -49,7 +49,7 @@ namespace ConEx
 
         //Thanks Roslyn! http://referencesource.microsoft.com/#mscorlib/microsoft/win32/win32native.cs
         [Flags]
-        private enum Color : short
+        public enum Color : short
         {
             Black = 0,
             ForegroundBlue = 0x1,
